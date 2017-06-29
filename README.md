@@ -1,0 +1,3 @@
+# Olympic history 
+
+This repo contains scripts for scraping and analyzing historical data on all Olympic athletes since the 1986 Olympics. This data was scraped from the soon-to-be defunct www.sports-reference.com, although as explained in this [blog post](http://olympstats.com/2016/08/21/the-olymadmen-and-olympstats-and-sports-reference/) by the creators of the database, it will eventually become part of the IOC's Olympic Statistical Database. When that will happen and whether that data will be publicly available is unclear. In the mean time, I'm glad that I managed to scrape this dataset before the Olympic section of www.sports-reference.com disappears! 
