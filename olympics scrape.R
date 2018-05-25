@@ -6,7 +6,6 @@
 
 library("RCurl")
 library("XML")
-library("data.table") 
 library("tidyverse")
 
 ######################################
@@ -61,20 +60,20 @@ infobox <- results_table <- vector("list", length(individual_links))
 system.time( 
   for (i in 1:135584) {
     
-    # get xml (wait a minute and try again if it times out and throws and error)
-    xml <- try(getURL(individual_links[i], .opts=curlOptions(followlocation=TRUE)), silent=TRUE)
-    if(class(xml) == "try-error") {
+    # get html (wait a minute and try again if it times out and throws and error)
+    html <- try(getURL(individual_links[i], .opts=curlOptions(followlocation=TRUE)), silent=TRUE)
+    if(class(html) == "try-error") {
       Sys.sleep(60)
-      xml <- getURL(individual_links[i], .opts=curlOptions(followlocation=TRUE))
+      html <- getURL(individual_links[i], .opts=curlOptions(followlocation=TRUE))
     }
-    xml <- htmlParse(xml, asText=TRUE)
+    html <- htmlParse(html, asText=TRUE)
     
     # save 'infobox'
-    infobox[[i]] <- xpathSApply(xml, '//*[@id="info_box"]/p', xmlValue) %>%
+    infobox[[i]] <- xpathSApply(html, '//*[@id="info_box"]/p', xmlValue) %>%
     strsplit('\n') %>% .[[1]]
     
     # save 'results table'
-    results_table[[i]] <- readHTMLTable(xml) %>% .$results
+    results_table[[i]] <- readHTMLTable(html) %>% .$results
     
     # track progress in console
     print(i)
