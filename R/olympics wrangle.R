@@ -5,6 +5,7 @@
 # Load packages
 library("XML")
 library("tidyverse")
+library("stringi")
 
 # Load data (takes a few seconds)
 load('C:/Users/Randi Griffin/Documents/GitHub/Olympic_history/scrapings.Rdata')
@@ -189,12 +190,17 @@ data$Sport %>% unique # 66 levels
 data$Event %>% unique # 679 levels - bad text encoding should be fixed
 data$Medal %>% unique # replace "" with NA
 
+# Name and Team variables contain a lot of non-ascii characters which I will remove
+data$Name <- data$Name %>% iconv("UTF-8","ASCII", sub="")
+data$Team <- data$Team %>% iconv("UTF-8","ASCII", sub="")
+
 # Convert Age variable to integer type
 data$Age <- data$Age %>% parse_integer
 
 # Change 'Equestrian' to 'Summer' in Games and Season variables
 data$Games[data$Games == "1956 Equestrian"] <- "1956 Summer"
 data$Season[data$Season == "Equestrian"] <- "Summer"
+data$Season <- data$Season %>% as.factor
 
 # Replace "" with NA in Medal variable
 data$Medal[data$Medal == ""] <- NA
@@ -241,6 +247,11 @@ for (i in 1:length(problem_events)) {
 }
 data$Event <- data$Event %>% as.factor
 
+# Since some event names can correspond to different sports (e.g., "Men's 100 meters" can be many sports)
+# The Event column should include the name of the sport as well
+data$Event <- paste(data$Sport, data$Event)
+data$Event <- data$Event %>% as.factor
+
 # Clean up workspace
 rm(list=c("i","problem_cities","problem_events","correct_cities","correct_events","events","cities"))
 
@@ -249,7 +260,7 @@ rm(list=c("i","problem_cities","problem_events","correct_cities","correct_events
 #############
 
 # Write table
-write.csv(data, "C:/Users/Randi Griffin/Documents/GitHub/Olympic_history/athlete_events.csv", row.names=FALSE, quote=FALSE)
+write.csv(data, "C:/Users/Randi Griffin/Documents/GitHub/Olympic_history/data/athlete_events.csv", row.names=FALSE)
 
 #######
 # END #
