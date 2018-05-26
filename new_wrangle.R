@@ -122,54 +122,54 @@ sum(((!is.na(info$Weight)) + (!is.na(info$Height))) == 2) # 99593 have both heig
 # Clean up workspace
 rm(list=c("gender_check","infobox"))
 
-#################################
-# Check and parse results_table #
-#################################
+#######################
+# Check results_table #
+#######################
 
 # Are the tables consistent across athletes?
-results_table %>% lapply(ncol) %>% unique # 10 columns in every table
-results_table %>% lapply(names) %>% unique # same names in every table
+results_table %>% lapply(ncol) %>% unique # 10 columns in every table (if not null)
+results_table %>% lapply(names) %>% unique # same names in every table (if not null)
 
 # How many null entries? 
-which(results_table %>% lapply(nrow) %>% is.null)
 results_table %>% lapply(is.null) %>% unlist %>% sum # 13 NULL entries
 nulls <- which(results_table %>% lapply(is.null) %>% unlist) # these should be dropped
 
 # Drop NULL entries from both info and results
 info <- info[-nulls,]
 results_table <- results_table[-nulls]
-nrow(info) # 135571
-length(results_table) # 135571
+n_athletes2 <- length(results_table) # new number of athletes: 135571
 
-# Keep columns of interest
+# Keep columns of interest (drop 'Rank' and empty final column)
 keep <- c("Games", "Age", "City", "Sport", "Event", "Team", "NOC", "Medal")
-results <- lapply(results_table, function (x) {x[,keep]})
+results_table <- lapply(results_table, function (x) {x[,keep]})
+
+# Clean up workspace
+rm(list=c("n_athletes","nulls","keep"))
 
 ############################
 # Combine info and results #
 ############################
 
-# Loop through athletes to combine info and results (takes )
-r <- results %>% lapply(nrow) %>% unlist %>% sum # 271116
-data <- data.frame()
-next_line <- 1
-for (i in 1:nrow(info)) {
-  n <- nrow(results[[i]])
-  end_line <- next_line + n - 1
-  data[next_line:end_line,] <- cbind(info[i,], results[[i]])
-  next_line <- end_line + 1
-  print(i)
-  flush.console()
-  }
+# Join the data frame and list
+info$ID <- as.character(1:nrow(info))
+results_table <- setNames(results_table, info$ID)
+data <- data.table::rbindlist(results_table, use.names=TRUE, idcol="ID")
+data <- right_join(info, data, by="ID")
 
 # Split Olympic year and season
 data$Games <- data$Games %>% as.character
 data <- mutate(data, Year = strsplit(Games, " ")[[1]][1])
 data <- mutate(data, Season = strsplit(Games, " ")[[1]][2])
 
-############################################################################################################
-# Write data
-############################################################################################################
+# Reorder the variables
+
+###############
+# Fine tuning #
+###############
+
+#############
+# Save data #
+#############
 
 # Write table
 write.csv(data, "C:/Users/Randi Griffin/Desktop/athlete_events.csv", row.names=FALSE, quote=FALSE)
