@@ -3,9 +3,7 @@
 ##########################
 
 # Load packages
-library("XML")
 library("tidyverse")
-library("stringi")
 
 # Load data (takes a few seconds)
 load('C:/Users/Randi Griffin/Documents/GitHub/Olympic_history/scrapings.Rdata')
