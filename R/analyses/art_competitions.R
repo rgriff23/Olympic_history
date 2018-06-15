@@ -44,11 +44,7 @@ art %>% select(Year, City) %>% unique %>% arrange(Year)
 
 # View unique Year/City arranged by Year
 art %>% select(Year, City) %>% unique %>% arrange(Year)
-```
 
-Over this period, the number of events, participating nations, and artists grew somewhat irregularly. There was a jump in the number of nations and athletes participating in 1924, and perhaps in response to this increased participation, the number of events jumped up in 1928. 
-
-```{r}
 # Count Events, Nations, and Artists each year
 counts <- art %>% filter(Team != "Unknown") %>%
   group_by(Year) %>%
